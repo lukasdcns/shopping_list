@@ -1,73 +1,78 @@
-import { useEffect, useState } from "react";
+"use client";
+import { redirect, useRouter } from "next/navigation";
+import LoginForm from "./components/login/loginForm";
+import { handleLoginFormSubmit } from "@/app/lib/actions";
+import { useFormState } from "react-dom";
 import { getUser } from "./lib/users";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
-export default async function Home() {
-	const user = await getUser();
+const initialState = {
+	message: "",
+	data: null,
+};
+
+export default function Home() {
+	const router = useRouter();
+	const [user, setUser] = useState();
+	const searchUser = async () => {
+		return await getUser();
+	};
+
+	useEffect(() => {
+		searchUser().then((user) => setUser(user));
+	}, []);
+
+	const [state, formAction] = useFormState(
+		handleLoginFormSubmit,
+		initialState,
+	);
 
 	if (!user) {
 		return (
-			<main className="flex flex-row">
-				<section className="w-1/2 h-screen flex flex-col justify-center items-center bg-schooner">
-					<header>
-						<h2 className="text-3xl font-bold text-center text-pampas py-4">
-							Créer une liste de course
-						</h2>
-					</header>
-					<article className="text-pampas">
-						<ul className="list-disc">
-							<li className="font-base text-sm pb-1">
-								Créez une liste puis partagez là avec vos
-								proches
-							</li>
-							<li className="font-base text-sm pb-1">
-								Elle sera supprimer au bout de 24h
-							</li>
-							<li className="font-base text-sm pb-1">
-								Vous ne pourrez plus la modifier une fois
-								l&apos;onglet fermé
-							</li>
-						</ul>
-						<Link
-							href="/list/new"
-							className="inline-block w-full text-center bg-merlin text-pampas py-2 px-4 mt-2 rounded-lg shadow-md"
-						>
-							Créer une liste
-						</Link>
-					</article>
-				</section>
-				<section className="w-1/2 h-screen flex flex-col justify-center items-center bg-pampas">
-					<header>
-						<h2 className="text-3xl font-bold text-center text-schooner py-4">
-							Créer un compte ou Connectez-vous
-						</h2>
-					</header>
-					<article className="text-schooner">
-						<ul className="list-disc">
-							<li className="font-base text-sm pb-1">
-								Créez une liste puis partagez là avec vos
-								proches
-							</li>
-							<li className="font-base text-sm pb-1">
-								Elle ne sera pas supprimer
-							</li>
-							<li className="font-base text-sm pb-1">
-								Vous pourrez la modifier autant de fois que vous
-								le souhaitez
-							</li>
-						</ul>
-						<Link
-							href="/login"
-							className="inline-block w-full text-center bg-merlin text-pampas py-2 px-4 mt-2 rounded-lg shadow-md"
-						>
-							Continuer
-						</Link>
-					</article>
-				</section>
-			</main>
+			<>
+				{!state.data ? (
+					<main>
+						<header>
+							<h1 className="text-3xl font-bold text-center text-merlin py-4 mt-10">
+								Liste de course partagée
+							</h1>
+							<p className="text-merlin text-center">
+								<strong className="font-medium">
+									Créez une liste de courses et partagez-la
+									avec vos proches.
+								</strong>
+							</p>
+						</header>
+						<div className="w-1/4 mt-6 mx-auto flex flex-col justify-center items-center">
+							<LoginForm
+								buttonText="Continuer"
+								placeholder="Entrez votre adresse email"
+								formAction={formAction}
+								state={state}
+							/>
+							<Link
+								href="list/new"
+								className="font-light text-merlin mx-auto text-sm mt-2 transition"
+							>
+								<span className="underline-effect">
+									Ou continuez sans compte
+								</span>
+							</Link>
+						</div>
+					</main>
+				) : (
+					<div className="h-screen w-screen flex justify-center items-center">
+						<div className="w-1/4mx-auto bg-schooner py-10 rounded-lg shadow-md px-6">
+							<p className="text-center font-semibold text-sm text-pampas">
+								{state.message}
+							</p>
+						</div>
+					</div>
+				)}
+			</>
 		);
 	} else {
-		redirect("/lists");
+		router.push("/lists");
 	}
 }

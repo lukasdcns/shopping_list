@@ -9,7 +9,7 @@ export async function handleLoginFormSubmit(prevState: any, formData: FormData) 
 
     if (!destination) {
       return {
-          message: "Email is missing in form data"
+          message: "Merci de renseigner une adresse email"
         };
     }
 
@@ -35,7 +35,7 @@ export async function handleLoginFormSubmit(prevState: any, formData: FormData) 
 
       return {
         data: data,
-        message: "An email has been sent to you with a link to log in"
+        message: "Un email vous à été envoyé pour vous connecter à votre compte"
         };
     } catch (error) {
       console.error("Fetch error:", error);
