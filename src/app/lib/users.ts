@@ -6,6 +6,7 @@ export async function getUser() {
         const { sessionUserId, sessionToken } = sessionData;
 
         return await fetch(`http://localhost:3000/users/${sessionUserId}`, {
+            cache: 'force-cache',
             method: 'GET',
             headers: {
                 'accept': 'application/json',
